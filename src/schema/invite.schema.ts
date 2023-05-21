@@ -30,7 +30,7 @@ export class Invite {
     type: mongoose.Schema.Types.ObjectId,
     require: true,
   })
-  source: string[];
+  source;
 
   @Prop({
     default: 0,

@@ -15,6 +15,15 @@ import { JwtAuthGuard, JwtRefreshGuard, LocalAuthGuard } from './guards';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh')
+  async refreshToken(@Request() req) {
+    return await this.authService.refreshToken(
+      req.user.refreshToken,
+      req.user.id,
+    );
+  }
+
   @Post('sign-up')
   async signUp(@Body() dto: SignUpDto) {
     return await this.authService.signUpUser(dto);
@@ -26,17 +35,8 @@ export class AuthController {
     return await this.authService.signInUser(req.user.id, req.user.username);
   }
 
-  @UseGuards(JwtRefreshGuard)
-  @Post('refresh')
-  async refreshToken(@Request() req) {
-    return await this.authService.refreshToken(
-      req.user.refreshToken,
-      req.user.id,
-    );
-  }
-
   @UseGuards(JwtAuthGuard)
-  @Post('sign-out/')
+  @Post('sign-out')
   async signOut(@Request() req) {
     await this.signOut(req.user.id);
   }

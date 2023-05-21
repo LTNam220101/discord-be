@@ -11,7 +11,7 @@ export class Server {
   name: string;
 
   @Prop({ required: true })
-  description;
+  description: string;
 
   @Prop({ defaultValue: false })
   isPublic: boolean;
@@ -23,10 +23,10 @@ export class Server {
   inviteLinkIds: string[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  members: User[];
+  members: mongoose.Schema.Types.ObjectId[];
 
   @Prop()
-  requestJoinUsers: string[];
+  requestJoinUsers: mongoose.Schema.Types.ObjectId[];
 }
 
 export const ServerSchema = SchemaFactory.createForClass(Server);

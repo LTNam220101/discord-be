@@ -2,7 +2,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Server } from './server.schema';
-import { ServerRoleGroup } from './serverRoleGroup.schema';
 import { User } from './user.schema';
 
 export type UserServerRoleDocument = HydratedDocument<UserServerRole>;
@@ -23,7 +22,7 @@ export class UserServerRole {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ServerRoleGroup' }],
     require: true,
   })
-  serverRoleGroupId: ServerRoleGroup;
+  serverRoleGroupId: mongoose.Schema.Types.ObjectId[];
 }
 
 export const UserServerRoleSchema =

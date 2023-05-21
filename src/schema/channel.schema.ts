@@ -1,14 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Server } from './server.schema';
-import { User } from './user.schema';
 
 export type ChannelDocument = HydratedDocument<Channel>;
 
-enum Types {
-  TEXT,
-  VOICE,
+export enum Types {
+  TEXT = 0,
+  VOICE = 1,
 }
 
 @Schema()
@@ -17,13 +15,13 @@ export class Channel {
   name: string;
 
   @Prop({ required: true })
-  description;
+  description: string;
 
   @Prop({ defaultValue: true })
   isPrivate: boolean;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  users: User[];
+  users: mongoose.Schema.Types.ObjectId[];
 
   @Prop({
     type: Array,
@@ -34,7 +32,7 @@ export class Channel {
   @Prop({ require: true, default: Types.TEXT })
   type: Types;
 
-  @Prop({ type: mongoose.Schema.Types.Array })
+  @Prop({ type: mongoose.Schema.Types.Array, default: [] })
   inviteLinkIds: string[];
 
   @Prop({
@@ -42,7 +40,7 @@ export class Channel {
     ref: 'Server',
     require: true,
   })
-  serverId: Server;
+  serverId: mongoose.Schema.Types.ObjectId;
 }
 
 export const ChannelSchema = SchemaFactory.createForClass(Channel);

@@ -36,7 +36,7 @@ export class AuthService {
     }
   }
 
-  async signInUser(id: number, username: string) {
+  async signInUser(id: string, username: string) {
     const accessToken = await this.cryptoService.generateJwt({
       id,
       username,
@@ -77,7 +77,7 @@ export class AuthService {
     return user;
   }
 
-  async refreshToken(refreshToken: string, id: number) {
+  async refreshToken(refreshToken: string, id: string) {
     const user = await this.userService.findOneById(id);
     const check = await this.cryptoService.check(
       refreshToken,
@@ -97,7 +97,7 @@ export class AuthService {
     }
   }
 
-  async signOut(userId: number) {
+  async signOut(userId: string) {
     return await this.userService.updateUser(userId, {
       hashRefeshToken: null,
       deviceToken: null,
