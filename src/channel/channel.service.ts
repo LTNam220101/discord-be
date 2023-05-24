@@ -5,6 +5,9 @@ import { Channel } from 'src/schema/channel.schema';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Server } from 'src/schema/server.schema';
 import { UpdateChannelDto } from './dto/update-channel.dto';
+import { Message } from 'src/schema/message.schema';
+import { ChannelRoleGroup } from 'src/schema/channelRoleGroup.schema';
+import ChannelPolicy from 'src/constant/ChannelPolicy';
 
 @Injectable()
 export class ChannelService {
@@ -13,6 +16,10 @@ export class ChannelService {
     private channelRepo: Model<Channel>,
     @InjectModel('Server')
     private serverRepo: Model<Server>,
+    @InjectModel('Message')
+    private messageRepo: Model<Message>,
+    @InjectModel('ChannelRoleGroup')
+    private channelRoleGroupRepo: Model<ChannelRoleGroup>,
   ) {}
 
   async create(dto: CreateChannelDto) {
@@ -22,9 +29,17 @@ export class ChannelService {
         throw new Error('Invalid server');
       }
       const data = { ...dto, users: [dto.userId] };
-      const newChannel = this.channelRepo.create(data);
+      const newChannel = await this.channelRepo.create(data);
       if (!newChannel) throw new Error("Can't create channel");
-
+      const channelRole = await this.channelRoleGroupRepo.create({
+        name: '@everyone',
+        rolePolicies: [
+          ChannelPolicy.MANAGE_MESSAGE,
+          ChannelPolicy.VIEW_CHANNEL,
+        ],
+        channelId: newChannel.id,
+      });
+      if (!channelRole) throw new Error("Can't create role channel");
       return newChannel;
     } catch (error) {
       return {
@@ -69,29 +84,18 @@ export class ChannelService {
     }
   }
 
-  //   async getById(id: string) {
-  //     try {
-  //       const channel = await this.channelRepo
-  //         .findById(id)
-  //         .populate('users', 'fullname avatarUrl email');
-  //       if (!channel) throw new Error('invalid channel');
-  //       const messages = await MessageModel.find({
-  //         channelId: channel.id,
-  //       }).populate('author', 'fullname avatarUrl');
-  //       return {
-  //         status: OK,
-  //         data: {
-  //           ...channel._doc,
-  //           messages,
-  //         },
-  //       };
-  //     } catch (error) {
-  //       return {
-  //         status: ERR,
-  //         message: error.message,
-  //       };
-  //     }
-  //   }
+  async getById(id: string) {
+    const channel = await this.channelRepo
+      .findById(id)
+      .populate('users', 'fullname avatarUrl email');
+    if (!channel) throw new Error('invalid channel');
+    const messages = await this.messageRepo
+      .find({
+        channelId: channel.id,
+      })
+      .populate('author', 'fullname avatarUrl');
+    return channel;
+  }
 
   async getChannelForSocketIO(channelId: string) {
     try {

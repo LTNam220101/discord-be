@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { ServerModule } from './server/server.module';
 import { ChannelModule } from './channel/channel.module';
 import { InviteModule } from './invite/invite.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { InviteModule } from './invite/invite.module';
     ServerModule,
     ChannelModule,
     InviteModule,
+    MessageModule,
   ],
   controllers: [AppController],
 })

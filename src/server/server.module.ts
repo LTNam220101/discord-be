@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { InviteModule } from 'src/invite/invite.module';
+import { ChannelSchema } from 'src/schema/channel.schema';
 import { ServerSchema } from 'src/schema/server.schema';
 import { ServerRoleGroupSchema } from 'src/schema/serverRoleGroup.schema';
 import { UserServerRoleSchema } from 'src/schema/userServerRole.schema';
@@ -26,6 +27,10 @@ import { ServerRoleService } from './sever-role.service';
       {
         name: 'UserServerRole',
         schema: UserServerRoleSchema,
+      },
+      {
+        name: 'Channel',
+        schema: ChannelSchema,
       },
     ]),
     InviteModule,

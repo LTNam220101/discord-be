@@ -148,8 +148,8 @@ export class ServerController {
   @Put('/:serverId/user-role/:roleId')
   async addUserToRoleGroup(
     @Body() body,
-    @Param('roleId') roleId: string,
     @Param('serverId') serverId: string,
+    @Param('roleId') roleId: string,
   ) {
     const { userId } = body;
     return await this.userServerRoleService.update(serverId, roleId, userId);

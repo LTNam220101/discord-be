@@ -6,9 +6,9 @@ import { UserController } from './user.controller';
 import { ServerSchema } from 'src/schema/server.schema';
 import { UserServerRoleSchema } from 'src/schema/userServerRole.schema';
 import { UserServerRoleService } from './userServerRole.service';
-import { InviteSchema } from 'src/schema/invite.schema';
 import { InviteModule } from 'src/invite/invite.module';
 import { ServerModule } from 'src/server/server.module';
+import { InviteSchema } from 'src/schema/invite.schema';
 
 @Module({
   providers: [UserService, UserServerRoleService],

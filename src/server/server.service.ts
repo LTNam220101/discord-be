@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
+import { Channel } from 'src/schema/channel.schema';
 import { Server } from 'src/schema/server.schema';
 import { ServerRoleGroup } from 'src/schema/serverRoleGroup.schema';
 import { UserServerRole } from 'src/schema/userServerRole.schema';
@@ -11,6 +12,8 @@ export class ServerService {
   constructor(
     @InjectModel('Server')
     private serverRepo: Model<Server>,
+    @InjectModel('Channel')
+    private channelRepo: Model<Channel>,
     @InjectModel('ServerRoleGroup')
     private serverRoleGroupRepo: Model<ServerRoleGroup>,
     @InjectModel('UserServerRole')
@@ -18,23 +21,32 @@ export class ServerService {
   ) {}
 
   async create(dto: CreateServerDto) {
-    const create = await this.serverRepo.create(dto);
-    if (create) {
-      await this.update(create._id.toString(), { members: dto.ownerId });
+    const newServer = await this.serverRepo.create(dto);
+    if (newServer) {
+      await this.update(newServer._id.toString(), { members: dto.ownerId });
     }
+
+    // create general Channal
+    this.channelRepo.create({
+      serverId: newServer.id,
+      name: `General`,
+      description: `General channel`,
+      users: [dto.ownerId],
+      type: 0,
+    });
     // create role @everyone default
     const everyone = await this.serverRoleGroupRepo.create({
-      serverId: create._id.toString(),
+      serverId: newServer._id.toString(),
       name: 'everyone',
       rolePolicies: [3, 5],
     });
     // create user_role_server
     await this.userServerRoleRepo.create({
       userId: dto.ownerId,
-      serverId: create._id.toString(),
+      serverId: newServer._id.toString(),
       serverRoleGroupId: [everyone.id],
     });
-    return create;
+    return newServer;
   }
 
   async update(id: string, data: any) {
@@ -142,11 +154,30 @@ export class ServerService {
       server.requestJoinUsers = server.requestJoinUsers.filter(
         (item) => item.toString() !== userId.toString(),
       );
+      // find the everyone role server
+      const everyoneRoleServer = await this.serverRoleGroupRepo.findOne({
+        serverId: serverId,
+        name: `everyone`,
+      });
+
+      // Join all channels of server
+      const channels = await this.channelRepo.find({
+        serverId: serverId,
+      });
+      channels.forEach((channel) => {
+        channel.users.push(userId);
+      });
 
       await Promise.all([
         server.save(),
-        //  , ...channels.map(channel => channel.save())
+        ,
+        ...channels.map((channel) => channel.save()),
       ]);
+      await this.userServerRoleRepo.create({
+        serverId: serverId,
+        userId: userId,
+        serverRoleGroupId: [everyoneRoleServer.id],
+      });
       return {
         status: 200,
         data: `UserId: ${userId} join server: ${serverId} success`,

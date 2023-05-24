@@ -83,7 +83,7 @@ export class UserServerRoleService {
     });
     if (!user)
       throw new Error(`Cant find role group with roleId: ${serverRoleGroupId}`);
-    if (!user.serverRoleGroupId.includes(serverRoleGroupId))
+    if (user.serverRoleGroupId.includes(serverRoleGroupId))
       throw new Error(
         `User: ${userId} already had this role group: ${serverRoleGroupId}`,
       );
