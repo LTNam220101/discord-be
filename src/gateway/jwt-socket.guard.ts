@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../auth/auth.service';
 import { WsException } from '@nestjs/websockets';
 
 export class JwtSocketGuard implements CanActivate {
@@ -16,6 +16,7 @@ export class JwtSocketGuard implements CanActivate {
         bearerToken,
         'access',
       );
+      console.log(342134234523);
       if (decodedUser) {
         return true;
       }

@@ -8,6 +8,7 @@ import { ServerModule } from './server/server.module';
 import { ChannelModule } from './channel/channel.module';
 import { InviteModule } from './invite/invite.module';
 import { MessageModule } from './message/message.module';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MessageModule } from './message/message.module';
     ChannelModule,
     InviteModule,
     MessageModule,
+    GatewayModule,
   ],
   controllers: [AppController],
 })
