@@ -2,7 +2,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Channel } from './channel.schema';
-import { ChannelRoleGroup } from './ChannelRoleGroup.schema';
+import { ChannelRoleGroup } from './channelRoleGroup.schema';
 import { User } from './user.schema';
 
 export type UserChannelRoleDocument = HydratedDocument<UserChannelRole>;

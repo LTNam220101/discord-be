@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class CryptoService {
@@ -10,7 +10,7 @@ export class CryptoService {
     private jwtService: JwtService,
   ) {}
   async encrypt(password: string) {
-    return await bcrypt.hash(password, 10);
+    return await bcrypt.hashSync(password, 10);
   }
 
   async check(password: string, hashPassword: string) {
