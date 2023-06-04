@@ -1,16 +1,15 @@
 FROM node:18-alpine
- 
 WORKDIR /user/src/app
-
-RUN apk add --no-cache bash
-RUN npm i -g @nestjs/cli typescript ts-node
-
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
 COPY package*.json ./
- 
-COPY . .
-
-RUN cp .env.example .env
 
 RUN npm install
- 
-CMD ["npm", "run", "start:dev"]
+# If you are building your code for production
+# RUN npm ci --only=production
+COPY . .
+RUN npm run build
+
+EXPOSE 8080
+CMD [ "node", "dist/main" ]

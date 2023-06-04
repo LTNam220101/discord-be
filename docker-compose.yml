@@ -1,31 +1,16 @@
 
-version: "3"
+version: "1.0"
 services:
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
   nestjs-api:
     ports:
       - "3000:3000"
     build: .
     depends_on:
-      - mongodb
+    - redis
     environment:
-      - DATABASE_URL=mongodb://admin:admin@mongodb:27017/test?authSource=admin
-      - JWT_SECRET=quangJWT_SECRET
-      - JWT_EXPIRESIN=7d
-      - JWT_REFRESHSECRET=quangJWT_SECRET
-    volumes:
-      - ./:/user/src/app/
-  mongodb:
-    image: mongo:4.2.3-bionic
-    container_name: my-mongodb
-    ports:
-      - 27017:27017
-    environment:
-      - MONGO_INITDB_DATABASE=test
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
-    volumes:
-      # named volumes
-      - mongodb:/data/db
-volumes:
-  # default dir on Ubuntu: /var/lib/docker/volumes
-  mongodb:
+    - REDIS_HOST=redis

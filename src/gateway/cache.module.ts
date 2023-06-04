@@ -8,15 +8,18 @@ import {
 } from '@nestjs/common';
 import * as redisStore from 'cache-manager-ioredis';
 import { Cache } from 'cache-manager';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     BaseCacheModule.registerAsync({
-      useFactory: () => {
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
         return {
           store: redisStore,
-          host: 'localhost',
-          port: 6379,
+          host: config.get('REDIS_HOST'),
+          port: config.get('REDIS_PORT'),
         };
       },
     }),

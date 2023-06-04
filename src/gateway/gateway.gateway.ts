@@ -39,7 +39,9 @@ export class GatewayGateway
     console.log('after init');
   }
 
-  handleConnection(client: Socket, ...args: any[]) {}
+  handleConnection(client: Socket, ...args: any[]) {
+    console.log(client.id);
+  }
 
   async handleDisconnect(client: any) {
     const channelId = client?.channelId;
