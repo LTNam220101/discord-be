@@ -10,6 +10,8 @@ import { UserService } from './user.service';
 import { JwtAuthGuard } from './../auth/guards/jwt-auth.guard';
 import { InviteService } from 'src/invite/invite.service';
 import { ServerService } from 'src/server/server.service';
+import PermissionsGuard from 'src/auth/guards/role.guard';
+import ServerPolicy from 'src/constant/ServerPolicy';
 
 @Controller('user')
 export class UserController {

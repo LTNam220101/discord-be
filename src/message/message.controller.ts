@@ -9,12 +9,15 @@ import {
   Body,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards';
+import PermissionsGuard from 'src/auth/guards/role.guard';
+import ChannelPolicy from 'src/constant/ChannelPolicy';
 import { MessageService } from './message.service';
 
 @Controller('message')
 export class MessageController {
   constructor(private messageService: MessageService) {}
 
+  @UseGuards(PermissionsGuard(ChannelPolicy.CREATE_MESSAGE))
   @UseGuards(JwtAuthGuard)
   @Post('/:channelId')
   async sendMessage(

@@ -38,7 +38,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('sign-out')
   async signOut(@Request() req) {
-    await this.signOut(req.user.id);
+    await this.authService.signOut(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

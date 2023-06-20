@@ -12,7 +12,7 @@ export class ChannelRoleGroup {
   name: string;
 
   @Prop({ required: true })
-  rolePolicies: string[];
+  rolePolicies: number[];
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

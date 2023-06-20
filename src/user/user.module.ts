@@ -9,6 +9,10 @@ import { UserServerRoleService } from './userServerRole.service';
 import { InviteModule } from 'src/invite/invite.module';
 import { ServerModule } from 'src/server/server.module';
 import { InviteSchema } from 'src/schema/invite.schema';
+import { ChannelSchema } from 'src/schema/channel.schema';
+import { UserChannelRoleSchema } from 'src/schema/userChannelRole.schema';
+import { ServerRoleGroupSchema } from 'src/schema/serverRoleGroup.schema';
+import { ChannelRoleGroupSchema } from 'src/schema/channelRoleGroup.schema';
 
 @Module({
   providers: [UserService, UserServerRoleService],
@@ -24,12 +28,24 @@ import { InviteSchema } from 'src/schema/invite.schema';
         schema: ServerSchema,
       },
       {
+        name: 'Channel',
+        schema: ChannelSchema,
+      },
+      {
         name: 'UserServerRole',
         schema: UserServerRoleSchema,
       },
       {
-        name: 'Invite',
-        schema: InviteSchema,
+        name: 'UserChannelRole',
+        schema: UserChannelRoleSchema,
+      },
+      {
+        name: 'ServerRoleGroup',
+        schema: ServerRoleGroupSchema,
+      },
+      {
+        name: 'ChannelRoleGroup',
+        schema: ChannelRoleGroupSchema,
       },
     ]),
     InviteModule,

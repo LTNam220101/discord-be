@@ -5,6 +5,8 @@ import { ChannelRoleGroupSchema } from 'src/schema/channelRoleGroup.schema';
 import { MessageSchema } from 'src/schema/message.schema';
 import { ServerSchema } from 'src/schema/server.schema';
 import { ServerRoleGroupSchema } from 'src/schema/serverRoleGroup.schema';
+import { UserChannelRoleSchema } from 'src/schema/userChannelRole.schema';
+import { UserServerRoleSchema } from 'src/schema/userServerRole.schema';
 import { ChannelRoleGroupService } from './channel-role.service';
 import { ChannelController } from './channel.controller';
 import { ChannelService } from './channel.service';
@@ -30,6 +32,14 @@ import { ChannelService } from './channel.service';
       {
         name: 'ChannelRoleGroup',
         schema: ChannelRoleGroupSchema,
+      },
+      {
+        name: 'UserServerRole',
+        schema: UserServerRoleSchema,
+      },
+      {
+        name: 'UserChannelRole',
+        schema: UserChannelRoleSchema,
       },
       {
         name: 'Message',

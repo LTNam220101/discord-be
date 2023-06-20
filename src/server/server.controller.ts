@@ -9,7 +9,6 @@ import {
   Get,
   Put,
   Request,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { InviteService } from 'src/invite/invite.service';
@@ -18,6 +17,8 @@ import { CreateServerDto } from './dto/create-server.dto';
 import { UpdateServerDto } from './dto/update-server.dto';
 import { ServerService } from './server.service';
 import { ServerRoleService } from './sever-role.service';
+import ServerPolicy from 'src/constant/ServerPolicy';
+import PermissionsGuard from 'src/auth/guards/role.guard';
 
 @Controller('server')
 export class ServerController {
@@ -68,6 +69,7 @@ export class ServerController {
     return await this.serverService.getById(serverId, req.user.id);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_SERVER))
   @UseGuards(JwtAuthGuard)
   @Post('/response-requests')
   async responseUserRequestJoin(@Body() body) {
@@ -81,6 +83,7 @@ export class ServerController {
       );
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_INVITE))
   @UseGuards(JwtAuthGuard)
   @Post('/create-invite/:serverId')
   async createInviteServer(@Param('serverId') serverId: string, @Body() body) {
@@ -99,6 +102,7 @@ export class ServerController {
     return await this.serverService.kickUser(userId, serverId);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Post('/:serverId/roles')
   async createRoleGroup(@Param('serverId') serverId: string, @Body() body) {
@@ -106,6 +110,7 @@ export class ServerController {
     return await this.serverRoleService.create(name, serverId, rolePolicies);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Get('/:serverId/roles')
   async getAllRoleGroup(
@@ -116,6 +121,7 @@ export class ServerController {
     return await this.serverRoleService.getAll(serverId, page, perpage);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Delete('/:serverId/roles/:roleId')
   async deleteRoleGroup(
@@ -125,6 +131,7 @@ export class ServerController {
     return await this.serverRoleService.delete(roleId, serverId);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Get('/:serverId/roles/:roleId')
   async getRoleGroup(
@@ -134,6 +141,7 @@ export class ServerController {
     return await this.serverRoleService.get(roleId, serverId);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Put('/:serverId/roles/:roleId')
   async updateRoleGroup(
@@ -144,6 +152,7 @@ export class ServerController {
     return await this.serverRoleService.update(serverId, roleId, body);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Put('/:serverId/user-role/:roleId')
   async addUserToRoleGroup(
@@ -155,6 +164,7 @@ export class ServerController {
     return await this.userServerRoleService.update(serverId, roleId, userId);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Get('/:serverId/user-role/:userId')
   async getDetailRolesUserOnServer(
@@ -164,6 +174,7 @@ export class ServerController {
     return await this.userServerRoleService.get(serverId, userId);
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Get('/:serverId/user-role/get-all-members/:roleId')
   async getAllUsersBelongRoleGroup(
@@ -180,6 +191,7 @@ export class ServerController {
     );
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Get('/:serverId/user-role/users-not-belong/:roleId')
   async getUsersNotBelongRoleGroup(
@@ -192,6 +204,7 @@ export class ServerController {
     );
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Delete('/:serverId/user-role/:roleId/:userId')
   async removeUserFromRoleGroup(
