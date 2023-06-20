@@ -4,6 +4,7 @@ import {
   Injectable,
   mixin,
   Type,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -42,23 +43,13 @@ const PermissionsGuard = (
       const serverId = req.params.serverId || req.body.serverId;
       if (serverId) {
         const server = await this.serverRepo.findOne({ _id: serverId });
-        // if (!server)
-        //   throw new CusError(
-        //     apiStatus.AUTH_ERROR,
-        //     httpStatus.UNAUTHORIZED,
-        //     'Server is invalid',
-        //   );
+        if (!server) throw new BadRequestException('Server is invalid');
         if (server.ownerId.toString() === req.user.id) return true;
         const role = await this.userServerRoleRepo.findOne({
           serverId: server.id,
           userId: req.user.id,
         });
-        // if (!role)
-        //   throw new CusError(
-        //     apiStatus.AUTH_ERROR,
-        //     httpStatus.UNAUTHORIZED,
-        //     'You are not a server member',
-        //   );
+        if (!role) throw new BadRequestException('You are not a server member');
 
         const policyServer = await this.ServerRoleGroupRepo.findOne({
           _id: role.serverRoleGroupId,
@@ -69,12 +60,7 @@ const PermissionsGuard = (
       const channelId = req.body.channelId || req.params.channelId;
       if (channelId) {
         const channel = await this.channelRepo.findById(channelId);
-        // if (!channel)
-        //   throw new CusError(
-        //     apiStatus.AUTH_ERROR,
-        //     httpStatus.UNAUTHORIZED,
-        //     'Invalid channel',
-        //   );
+        if (!channel) throw new BadRequestException('Invalid channel');
 
         const userRole = await this.userChannelRoleRepo.findOne({
           channelId: channel.id,
