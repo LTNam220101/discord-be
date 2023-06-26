@@ -48,4 +48,28 @@ export class UserService {
       data: {},
     };
   }
+
+  // async forgotPassword(email: string) {
+  //   if (!validator.isEmail(email)) {
+  //     throw new CusError(
+  //       apiStatus.INVALID_PARAM,
+  //       httpStatus.BAD_REQUEST,
+  //       'Invalid email',
+  //     );
+  //   }
+
+  //   const user = await this.findOneByUsername(email);
+  //   if (!user) {
+  //     throw new CusError(
+  //       apiStatus.AUTH_ERROR,
+  //       httpStatus.BAD_REQUEST,
+  //       'Not found email',
+  //     );
+  //   }
+  //   // should send email
+  //   const resetToken = await signToken(user.id);
+  //   const url = `${process.env.CLIENT_URL}/reset-password${resetToken}`;
+
+  //   await new Email(user, url).sendPasswordReset();
+  // }
 }

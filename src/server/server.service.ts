@@ -21,9 +21,11 @@ export class ServerService {
   ) {}
 
   async create(dto: CreateServerDto) {
-    const newServer = await this.serverRepo.create(dto);
+    let newServer = await this.serverRepo.create(dto);
     if (newServer) {
-      await this.update(newServer._id.toString(), { members: dto.ownerId });
+      newServer = await this.update(newServer._id.toString(), {
+        members: [dto.ownerId],
+      });
     }
 
     // create general Channal
@@ -50,7 +52,6 @@ export class ServerService {
   }
 
   async update(id: string, data: any) {
-    //console.log(data);
     return await this.serverRepo.findByIdAndUpdate(id, data);
   }
 
@@ -76,7 +77,11 @@ export class ServerService {
     try {
       const server = await this.serverRepo.findById(id);
       if (!server) throw new Error(`Cant find Server with id: ${id}`);
-      if (!server.members.find((x) => x.toString() === userId))
+      if (
+        !server.members.find((x) => {
+          return x.toString() === userId;
+        })
+      )
         throw new Error(`You are not a member of server: ${id}`);
       return server;
     } catch (err) {

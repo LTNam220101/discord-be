@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsEmail } from 'class-validator';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Server } from './server.schema';
 
@@ -11,6 +12,7 @@ export class User {
     minLength: 7,
     unique: true,
   })
+  @IsEmail()
   username: string;
 
   @Prop({

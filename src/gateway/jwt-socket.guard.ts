@@ -16,7 +16,6 @@ export class JwtSocketGuard implements CanActivate {
         bearerToken,
         'access',
       );
-      console.log(342134234523);
       if (decodedUser) {
         return true;
       }

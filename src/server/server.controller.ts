@@ -9,6 +9,7 @@ import {
   Get,
   Put,
   Request,
+  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { InviteService } from 'src/invite/invite.service';
@@ -43,9 +44,9 @@ export class ServerController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('/delete')
-  async deleteServer(@Body() req: any) {
-    return await this.serverService.delete(req.serverId);
+  @Delete('/delete/:serverId')
+  async deleteServer(@Param('serverId') id: string) {
+    return await this.serverService.delete(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -91,10 +92,11 @@ export class ServerController {
       body.userId,
       body.expireTime,
       serverId,
-      0,
+      body.type,
     );
   }
 
+  @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_SERVER))
   @UseGuards(JwtAuthGuard)
   @Put('/kick-user')
   async kickUser(@Body() body) {

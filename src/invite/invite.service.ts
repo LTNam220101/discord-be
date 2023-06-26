@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Channel } from 'src/schema/channel.schema';
 import { Invite } from 'src/schema/invite.schema';
 import { Server } from 'src/schema/server.schema';
 
@@ -9,6 +10,8 @@ export class InviteService {
   constructor(
     @InjectModel('Server')
     private serverRepo: Model<Server>,
+    @InjectModel('Server')
+    private channelRepo: Model<Channel>,
     @InjectModel('Invite')
     private inviteRepo: Model<Invite>,
   ) {}
@@ -16,7 +19,7 @@ export class InviteService {
   async createInvite(owner, expire, sourceId, type) {
     const src = !type
       ? await this.serverRepo.findById(sourceId)
-      : await this.serverRepo.findById(sourceId);
+      : await this.channelRepo.findById(sourceId);
     if (!src) throw new Error(`SourceId : ${sourceId} is not exist`);
     const expireAt = new Date(Date.now() + expire);
     console.log(expire, new Date(Date.now() + expire));
