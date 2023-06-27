@@ -40,49 +40,49 @@ export class ChannelController {
 
   @UseGuards(PermissionsGuard(ChannelPolicy.MANAGE_CHANNEL))
   @UseGuards(JwtAuthGuard)
-  @Put('/:channelId')
+  @Put('/:serverId/:channelId')
   async update(@Param('channelId') channelId: string, @Request() data) {
     return await this.channelService.update(channelId, data);
   }
 
   @UseGuards(PermissionsGuard(ChannelPolicy.MANAGE_CHANNEL))
   @UseGuards(JwtAuthGuard)
-  @Delete('/:channelId')
+  @Delete('/:serverId/:channelId')
   async delete(@Param('channelId') channelId: string) {
     return await this.channelService.delete(channelId);
   }
 
   @UseGuards(PermissionsGuard(ChannelPolicy.VIEW_CHANNEL))
   @UseGuards(JwtAuthGuard)
-  @Get('/:channelId')
+  @Get('/:serverId/:channelId')
   async getById(@Param('channelId') channelId: string) {
     return await this.channelService.getById(channelId);
   }
 
   @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
-  @Post('/:channelId/role')
+  @Post('/:serverId/:channelId/role')
   async createRoleChannel(@Body() dto, @Param('channelId') channelId: string) {
     const { name, serverId } = dto;
     return await this.channelRoleGroupService.create(name, serverId, channelId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/:channelId/role/:roleId')
+  @Get('/:serverId/:channelId/role/:roleId')
   async getRoleChannelById(@Param('roleId') roleId: string) {
     return await this.channelRoleGroupService.getById(roleId);
   }
 
   @UseGuards(PermissionsGuard(ChannelPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
-  @Put('/:channelId/role/:roleId')
+  @Put('/:serverId/:channelId/role/:roleId')
   async updateRoleChannel(@Body() dto, @Param('channelId') channelId: string) {
     return await this.channelRoleGroupService.update(channelId, dto);
   }
 
   @UseGuards(PermissionsGuard(ChannelPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
-  @Delete('/:channelId/role/:roleId')
+  @Delete('/:serverId/:channelId/role/:roleId')
   async deleteRoleChannel(@Param('channelId') channelId: string) {
     return await this.channelRoleGroupService.delete(channelId);
   }

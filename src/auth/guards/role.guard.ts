@@ -41,23 +41,10 @@ const PermissionsGuard = (
       const req = context.switchToHttp().getRequest();
       console.log(policy);
       const serverId = req.params.serverId || req.body.serverId;
-      if (serverId) {
-        const server = await this.serverRepo.findOne({ _id: serverId });
-        if (!server) throw new BadRequestException('Server is invalid');
-        if (server.ownerId.toString() === req.user.id) return true;
-        const role = await this.userServerRoleRepo.findOne({
-          serverId: server.id,
-          userId: req.user.id,
-        });
-        if (!role) throw new BadRequestException('You are not a server member');
-
-        const policyServer = await this.ServerRoleGroupRepo.findOne({
-          _id: role.serverRoleGroupId,
-        });
-
-        if (policyServer.rolePolicies.includes(policy)) return true;
-      }
       const channelId = req.body.channelId || req.params.channelId;
+      const server = await this.serverRepo.findOne({ _id: serverId });
+      if (!server) throw new BadRequestException('Server is invalid');
+      if (server.ownerId.toString() === req.user.id) return true;
       if (channelId) {
         const channel = await this.channelRepo.findById(channelId);
         if (!channel) throw new BadRequestException('Invalid channel');
@@ -78,6 +65,19 @@ const PermissionsGuard = (
           name: '@everyone',
         });
         if (policyChannel?.rolePolicies.includes(policy)) return true;
+      }
+      if (serverId) {
+        const role = await this.userServerRoleRepo.findOne({
+          serverId: server.id,
+          userId: req.user.id,
+        });
+        if (!role) throw new BadRequestException('You are not a server member');
+
+        const policyServer = await this.ServerRoleGroupRepo.findOne({
+          _id: role.serverRoleGroupId,
+        });
+
+        if (policyServer.rolePolicies.includes(policy)) return true;
       }
       return false;
     }
