@@ -41,7 +41,8 @@ export class ChannelController {
   @UseGuards(PermissionsGuard(ChannelPolicy.MANAGE_CHANNEL))
   @UseGuards(JwtAuthGuard)
   @Put('/:serverId/:channelId')
-  async update(@Param('channelId') channelId: string, @Request() data) {
+  async update(@Param('channelId') channelId: string, @Body() data) {
+    console.log(channelId, data);
     return await this.channelService.update(channelId, data);
   }
 

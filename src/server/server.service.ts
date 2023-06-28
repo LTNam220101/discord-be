@@ -52,7 +52,11 @@ export class ServerService {
   }
 
   async update(id: string, data: any) {
-    return await this.serverRepo.findByIdAndUpdate(id, data);
+    const dataRes = await this.serverRepo.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    console.log(dataRes);
+    return dataRes;
   }
 
   async delete(id: string) {
@@ -150,6 +154,7 @@ export class ServerService {
 
   async joinServer(userId: ObjectId, serverId: string) {
     try {
+      console.log(userId, serverId);
       const server = await this.serverRepo.findById(serverId);
       if (server.members.includes(userId))
         throw new Error(
@@ -197,6 +202,7 @@ export class ServerService {
 
   async kickUser(userId: ObjectId, serverId: string) {
     try {
+      console.log(userId, serverId);
       const server = await this.serverRepo.findById(serverId);
       if (!server.members.includes(userId))
         throw new Error(`User: ${userId} not be member of this server`);
