@@ -63,8 +63,12 @@ export class ChannelController {
   @UseGuards(PermissionsGuard(ServerPolicy.MANAGE_ROLE))
   @UseGuards(JwtAuthGuard)
   @Post('/:serverId/:channelId/role')
-  async createRoleChannel(@Body() dto, @Param('channelId') channelId: string) {
-    const { name, serverId } = dto;
+  async createRoleChannel(
+    @Body() dto,
+    @Param('channelId') channelId: string,
+    @Param('serverId') serverId: string,
+  ) {
+    const { name } = dto;
     return await this.channelRoleGroupService.create(name, serverId, channelId);
   }
 
