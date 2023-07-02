@@ -50,9 +50,10 @@ const PermissionsGuard = (
         if (!channel) throw new BadRequestException('Invalid channel');
 
         const userRole = await this.userChannelRoleRepo.findOne({
-          channelId: channel.id,
+          channelId: channelId,
           userId: req.user.id,
         });
+        console.log(channelId, req.user.id, userRole);
         if (userRole) {
           const policyChannel = await this.channelRoleGroupRepo.findOne({
             _id: userRole.channelRoleGroupId,
@@ -61,14 +62,14 @@ const PermissionsGuard = (
         }
 
         const policyChannel = await this.channelRoleGroupRepo.findOne({
-          channelId: channel.id,
+          channelId: channelId,
           name: '@everyone',
         });
         if (policyChannel?.rolePolicies.includes(policy)) return true;
       }
       if (serverId) {
         const role = await this.userServerRoleRepo.findOne({
-          serverId: server.id,
+          serverId: serverId,
           userId: req.user.id,
         });
         if (!role) throw new BadRequestException('You are not a server member');

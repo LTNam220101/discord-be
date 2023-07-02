@@ -37,7 +37,7 @@ export class ChannelService {
           ChannelPolicy.MANAGE_MESSAGE,
           ChannelPolicy.VIEW_CHANNEL,
         ],
-        channelId: newChannel.id,
+        channelId: newChannel._id,
       });
       if (!channelRole) throw new Error("Can't create role channel");
       return newChannel;

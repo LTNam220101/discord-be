@@ -55,9 +55,8 @@ export class GatewayGateway implements OnGatewayInit, OnGatewayConnection {
 
   //@UseGuards(JwtSocketGuard)
   @SubscribeMessage('joinChannel')
-  async joinChannel(client: Socket, { channelId }) {
+  async joinChannel(client: Socket, { channelId, userId }) {
     const channel = await this.channelService.getChannelForSocketIO(channelId);
-    const userId = client.handshake.query.userId as string;
     const user = await this.userService.findOneById(userId);
 
     if (!channelId || !channel) {
@@ -137,10 +136,8 @@ export class GatewayGateway implements OnGatewayInit, OnGatewayConnection {
 
   //@UseGuards(JwtSocketGuard)
   @SubscribeMessage('leaveChannel')
-  async leaveChannel(client: Socket, { channelId }) {
-    this.server
-      .to(channelId)
-      .emit('userLeftChannel', client.handshake.query.userId);
+  async leaveChannel(client: Socket, { channelId, userId }) {
+    this.server.to(channelId).emit('userLeftChannel', userId);
     client.leave(channelId);
     const cacheChannel = JSON.parse(
       (await this.redisClient.get(`channels/${channelId}`)) || null,
@@ -148,7 +145,7 @@ export class GatewayGateway implements OnGatewayInit, OnGatewayConnection {
     console.log(cacheChannel);
     if (cacheChannel) {
       cacheChannel.listActiveUserId = cacheChannel.listActiveUserId.filter(
-        (x) => x !== client.handshake.query.userId,
+        (x) => x !== userId,
       );
       await this.redisClient.set(
         `channels/${channelId}`,
@@ -160,7 +157,6 @@ export class GatewayGateway implements OnGatewayInit, OnGatewayConnection {
   //@UseGuards(JwtSocketGuard)
   @SubscribeMessage('sendMessage')
   async sendMessage(client: Socket, { content, channelId, userId }) {
-    console.log({ userId: userId, content, channelId });
     const curChannel = await this.channelService.getChannelForSocketIO(
       channelId,
     );
@@ -179,7 +175,6 @@ export class GatewayGateway implements OnGatewayInit, OnGatewayConnection {
       channelId,
       userId,
     );
-    console.log(newMessage);
     this.server.to(channelId).emit('newMessage', newMessage);
   }
 }

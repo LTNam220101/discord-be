@@ -18,7 +18,7 @@ export class MessageService {
     });
     return await this.messageRepo
       .findById(insertResult._id)
-      .populate('author', 'fullname avatarUrl');
+      .populate('author', 'username avatarUrl');
   }
 
   async getAllMessages(channelId) {
@@ -30,7 +30,7 @@ export class MessageService {
         $natural: 1,
       })
       .limit(20)
-      .populate('author', 'fullname avatarUrl');
+      .populate('author', 'username avatarUrl');
   }
 
   async deleteMessage(messageId) {

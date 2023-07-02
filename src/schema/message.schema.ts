@@ -6,7 +6,7 @@ import { User } from './user.schema';
 
 export type MessageDocument = HydratedDocument<Message>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Message {
   @Prop({ required: true })
   content: string;
