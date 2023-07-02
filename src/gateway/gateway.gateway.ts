@@ -22,9 +22,7 @@ import { Types } from 'src/schema/channel.schema';
     credentials: true,
   },
 })
-export class GatewayGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class GatewayGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
@@ -40,64 +38,60 @@ export class GatewayGateway
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(client.id);
-  }
-
-  async handleDisconnect(client: any) {
-    const channelId = client?.channelId;
-    console.log('User disconnect: ', client.userId, channelId);
-    client.leave(channelId);
-
-    this.server.to(channelId).emit('userLeftChannel', client.userId);
-
-    if (channelId) {
-      const cacheChannel = JSON.parse(
-        await this.redisClient.get(`channels/${channelId}`),
-        null,
-      );
-      if (cacheChannel) {
-        cacheChannel.listActiveUserId = cacheChannel.listActiveUserId.filter(
-          (x) => x !== client.userId,
-        );
-        await this.redisClient.set(
-          `channels/${channelId}`,
-          JSON.stringify(cacheChannel),
-        );
+    console.log('user connected', client.id);
+    client.on('disconnecting', (reason) => {
+      const iter = client.rooms.values();
+      console.log(iter.next().value);
+      const leaveChannel = iter.next().value;
+      console.log(leaveChannel);
+      // Out cac channel khac
+      if (leaveChannel) {
+        this.server
+          .to(leaveChannel)
+          .emit('userLeftChannel', { userLeft: client.handshake.query.userId });
       }
-    }
+    });
   }
 
   //@UseGuards(JwtSocketGuard)
   @SubscribeMessage('joinChannel')
-  async joinChannel(client: any, { channelId, userId }) {
+  async joinChannel(client: Socket, { channelId }) {
     const channel = await this.channelService.getChannelForSocketIO(channelId);
+    const userId = client.handshake.query.userId as string;
     const user = await this.userService.findOneById(userId);
 
     if (!channelId || !channel) {
       client.emit('rejectToChannel');
       return;
     }
+    const iter = client.rooms.values();
+    console.log(iter.next().value);
+    const leaveChannel = iter.next().value;
     // Out cac channel khac
-    if (channelId) {
+    if (leaveChannel) {
       // socket.to(socket.channelId).emit('userLeftChannel', socket.userId);
-      client.leave(channelId);
       const cacheChannel = JSON.parse(
-        (await this.redisClient.get(`channels/${channelId}`)) || null,
+        (await this.redisClient.get(`channels/${leaveChannel}`)) || null,
       );
       if (cacheChannel) {
         cacheChannel.listActiveUserId = cacheChannel.listActiveUserId.filter(
           (x) => x !== userId,
         );
         await this.redisClient.set(
-          `channels/${channelId}`,
+          `channels/${leaveChannel}`,
           JSON.stringify(cacheChannel),
         );
       }
+      this.server.to(leaveChannel).emit('userLeftChannel', {
+        userLeft: client.handshake.query.userId,
+        cacheChannel,
+      });
+      client.leave(leaveChannel);
     }
 
     // Push user vào cache channel
     const cacheChannel = JSON.parse(
-      (await this.redisClient.get(`channels/${channel._id}`)) || null,
+      (await this.redisClient.get(`channels/${channelId}`)) || null,
     );
     await this.redisClient.set(
       `channels/${channelId}`,
@@ -121,51 +115,51 @@ export class GatewayGateway
     }
 
     // Emit to all user in channel that a new user joined
-    client.to(channelId).emit('userJoinedChannel', user);
+    this.server.to(channelId).emit('userJoinedChannel', user);
     if (channel.type === Types.VOICE) {
-      client.to(channelId).emit('userJoinedVoiceChannel', user);
+      this.server.to(channelId).emit('userJoinedVoiceChannel', user);
     }
   }
 
   //@UseGuards(JwtSocketGuard)
   @SubscribeMessage('setupPeer')
-  async setupPeer(client: any, { isInitiator, from, to, channelId, signal }) {
+  async setupPeer(
+    client: Socket,
+    { isInitiator, from, to, channelId, signal },
+  ) {
     console.log('setupPeer', isInitiator, from, '-->', to, `[${channelId}]`);
 
     // Chuyển signal cho các user khác nhận
-    client
+    this.server
       .to(channelId)
       .emit('setupPeer', { isInitiator, from, to, channelId, signal });
   }
 
   //@UseGuards(JwtSocketGuard)
   @SubscribeMessage('leaveChannel')
-  async leaveChannel(client: any, { channelId, userId }) {
-    console.log('User leaveChannel: ', userId, channelId);
+  async leaveChannel(client: Socket, { channelId }) {
+    this.server
+      .to(channelId)
+      .emit('userLeftChannel', client.handshake.query.userId);
     client.leave(channelId);
-
-    this.server.to(channelId).emit('userLeftChannel', userId);
-
-    if (channelId) {
-      const cacheChannel = JSON.parse(
-        await this.redisClient.get(`channels/${channelId}`),
-        null,
+    const cacheChannel = JSON.parse(
+      (await this.redisClient.get(`channels/${channelId}`)) || null,
+    );
+    console.log(cacheChannel);
+    if (cacheChannel) {
+      cacheChannel.listActiveUserId = cacheChannel.listActiveUserId.filter(
+        (x) => x !== client.handshake.query.userId,
       );
-      if (cacheChannel) {
-        cacheChannel.listActiveUserId = cacheChannel.listActiveUserId.filter(
-          (x) => x !== userId,
-        );
-        await this.redisClient.set(
-          `channels/${channelId}`,
-          JSON.stringify(cacheChannel),
-        );
-      }
+      await this.redisClient.set(
+        `channels/${channelId}`,
+        JSON.stringify(cacheChannel),
+      );
     }
   }
 
   //@UseGuards(JwtSocketGuard)
   @SubscribeMessage('sendMessage')
-  async sendMessage(client: any, { content, channelId, userId }) {
+  async sendMessage(client: Socket, { content, channelId, userId }) {
     console.log({ userId: userId, content, channelId });
     const curChannel = await this.channelService.getChannelForSocketIO(
       channelId,
